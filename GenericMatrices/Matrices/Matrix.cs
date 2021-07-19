@@ -6,6 +6,7 @@ using GenericMatrices.MatrixExcepions;
 
 namespace GenericMatrices.Matrices
 {
+    // TODO: Add XML documentation.
     public abstract class Matrix<T> : IEnumerable<T>, IEnumerable
     {
         protected Matrix(int size) => this.Size = size > 0 ? size : throw new ArgumentException("Matrix size can't be lower than zero.");
