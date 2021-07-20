@@ -11,7 +11,6 @@ namespace GenericMatrices.Tests
     internal class DiagonalMatrixTests<T>
     {
         private const int DiagonalMatrixSize = 3;
-        private static readonly Random random = new Random();
         private readonly T[] source;
 
         public DiagonalMatrixTests(T[] source) => this.source = source;
