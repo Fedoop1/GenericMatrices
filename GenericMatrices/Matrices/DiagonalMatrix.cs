@@ -31,21 +31,18 @@ namespace GenericMatrices.Matrices
             return default(T);
         }
 
+        /// <inheritdoc/>
+        protected override void SetValue(int i, int j, T value) => this.matrixDiagonalValues[i] = value;
+
         /// <summary>
-        /// Method which defines setter access logic to matrix cells.
+        /// Determines whether indexes are valid in according to a special condition.
         /// </summary>
         /// <param name="i">Matrix row.</param>
         /// <param name="j">Matrix column.</param>
-        /// <param name="value">Value to set in specific cell.</param>
-        /// <exception cref="GenericMatrices.MatrixExcepions.MatrixIndexException">Throws when trying to set value outside of main diagonal.</exception>
-        protected override void SetValue(int i, int j, T value)
-        {
-            if (i != j)
-            {
-                throw new MatrixIndexException("Diagonal matrix doesn't support the ability to set elements outside the main diagonal.");
-            }
-
-            this.matrixDiagonalValues[i] = value;
-        }
+        /// <remarks>Diagonal matrix must have default values in all cells except main diagonal.</remarks>
+        /// <returns>
+        /// <c>true</c> if indexes are the same; otherwise, <c>false</c>.
+        /// </returns>
+        protected override bool IsValidCustomRules(int i, int j) => i == j;
     }
 }

@@ -13,62 +13,72 @@ namespace GenericMatrices.Tests
     internal class MatrixTests
     {
         private const int MatrixSize = 3;
-        private static Random random = new Random();
+        private Random random = new Random();
 
-        public void Indexer_InvalidValue_ThrowsMatrixIndexException() => Assert.Throws<MatrixIndexException>(() => new SquareMatrix<int>(MatrixSize)[-1, -1] = 0, "Matrix indexes can't be greater than matrix size and lower than zero.");
-
-        [TestCase(1, 1)]
-        [TestCase(0, 2)]
-        [TestCase(2, 2)]
-        public void CellChange_InvokeEventTests(int indexI, int indexJ)
+        [TestCaseSource(typeof(TestCaseSource), nameof(TestCaseSource.MatrixTestCases))]
+        public void Indexer_InvalidValue_ThrowsMatrixIndexException(Matrix<int> matrix)
         {
-            var matrix = new SquareMatrix<int>(MatrixSize);
-
-            for (int matrixIndexI = 0; matrixIndexI < MatrixSize; matrixIndexI++)
-            {
-                for (int matrixIndexJ = 0; matrixIndexJ < MatrixSize; matrixIndexJ++)
-                {
-                    matrix[matrixIndexI, matrixIndexJ] = random.Next();
-                }
-            }
-
-            CellChangeEventArgs<int> actualEventData = null;
-            matrix.CellChange += (sender, eventArgs) => actualEventData = eventArgs;
-            matrix[indexI, indexJ]++;
-
-            Assert.AreEqual(actualEventData.CellIndex, (indexI, indexJ));
-            Assert.AreEqual(actualEventData.NewValue, actualEventData.OldValue + 1);
+            Assert.Throws<MatrixIndexException>(() => matrix[-1, -1] = 0, "Matrix indexes can't be greater than matrix size and lower than zero.");
         }
 
-        [TestCase(new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 })]
-        public void GetEnumerator_ReturnIterator(int[] source)
+        [TestCaseSource(typeof(TestCaseSource), nameof(TestCaseSource.MatrixTestCases))]
+        public void Indexer_ValidValue_MustReturnMatrixCellValue(Matrix<int> matrix)
         {
-            var matrix = new SquareMatrix<int>(MatrixSize);
+            var indexI = random.Next(0, MatrixSize);
+            var indexJ = random.Next(0, MatrixSize);
+            var value = random.Next();
 
-            FillMatrix(matrix, source);
-
-            int index = 0;
-            foreach (var value in matrix)
+            // Special implementation-side validation rule (all cells except main diagonal must equals default value)
+            if(matrix is DiagonalMatrix<int>)
             {
-                if(value != source[index++])
-                {
-                    Assert.Fail();
-                }
+                indexI = indexJ;
             }
 
-            Assert.True(true);
+            matrix[indexI, indexJ] = value;
+
+            Assert.IsTrue(matrix[indexI, indexJ] == value);
         }
 
-        private static void FillMatrix<T>(Matrix<T> matrix, T[] source)
+        [TestCaseSource(typeof(TestCaseSource), nameof(TestCaseSource.MatrixTestCases))]
+        public void Event_CellChange_MustInvokeEvent(Matrix<int> matrix)
         {
-            int index = 0;
-            for (int matrixIndexI = 0; matrixIndexI < MatrixSize; matrixIndexI++)
+            int countOfCalls = 0;
+            CellChangeEventArgs<int> eventArgs = null;
+
+            matrix.CellChange += (sender, cellEventArgs) =>
             {
-                for (int matrixIndexJ = 0; matrixIndexJ < MatrixSize; matrixIndexJ++)
-                {
-                    matrix[matrixIndexI, matrixIndexJ] = source[index++];
-                }
+                countOfCalls++;
+                eventArgs = cellEventArgs;
+            };
+
+            var indexI = random.Next(0, MatrixSize);
+            var indexJ = random.Next(0, MatrixSize);
+            var value = random.Next();
+
+            // Special implementation-side validation rule (all cells except main diagonal must equals default value)
+            if (matrix is DiagonalMatrix<int>)
+            {
+                indexI = indexJ;
             }
+
+            matrix[indexI, indexJ] = value;
+
+            Assert.IsTrue(countOfCalls == 1 && eventArgs.CellIndex == (indexI, indexJ));
+        }
+
+        [TestCaseSource(typeof(TestCaseSource), nameof(TestCaseSource.MatrixTestCases))]
+        public void Size_ValidSize_ReturnSize(Matrix<int> matrix)
+        {
+            var actualMatrixSize = 0;
+
+            foreach (var item in matrix)
+            {
+                actualMatrixSize++;
+            }
+
+            actualMatrixSize = (int)Math.Sqrt(actualMatrixSize);
+
+            Assert.AreEqual(matrix.Size, actualMatrixSize);
         }
     }
 }

@@ -16,7 +16,7 @@ namespace GenericMatrices.Tests
         public DiagonalMatrixTests(T[] source) => this.source = source;
 
         [Test]
-        public void Set_DifferentIndexes_ThrowMatrixIndexException() => Assert.Throws<MatrixIndexException>(() => new DiagonalMatrix<T>(DiagonalMatrixSize)[0, 1] = source[1], "Diagonal matrix doesn't support the ability to set elements outside the main diagonal.");
+        public void Set_DifferentIndexes_ThrowMatrixIndexException() => Assert.Throws<MatrixIndexException>(() => new DiagonalMatrix<T>(DiagonalMatrixSize)[0, 1] = source[1], "Indexes does not follow the implementation-side validation rules.");
 
         [TestCase(0, 0)]
         [TestCase(1, 1)]

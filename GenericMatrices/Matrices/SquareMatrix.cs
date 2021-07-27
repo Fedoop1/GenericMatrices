@@ -24,5 +24,8 @@ namespace GenericMatrices.Matrices
 
         /// <inheritdoc/>
         protected override void SetValue(int i, int j, T value) => this.matrix[i, j] = value;
+
+        /// <inheritdoc/>
+        protected override bool IsValidCustomRules(int i, int j) => i < this.Size && j < this.Size;
     }
 }

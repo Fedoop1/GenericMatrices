@@ -43,8 +43,10 @@ namespace GenericMatrices.Matrices
         /// <param name="i">Matrix row.</param>
         /// <param name="j">Matrix column.</param>
         /// <returns>The matrix cell value</returns>
-        /// <exception cref="GenericMatrices.MatrixExcepions.MatrixIndexException">
+        /// <exception cref="MatrixIndexException">
         /// Throws when index greater than matrix size or lower than zero.
+        /// or
+        /// Throws when index does not follow the implementation-side validation rules.
         /// </exception>
         public T this[int i, int j]
         {
@@ -63,6 +65,11 @@ namespace GenericMatrices.Matrices
                 if (!this.IsValidIndex(i, j))
                 {
                     throw new MatrixIndexException("Matrix indexes can't be greater than matrix size and lower than zero.");
+                }
+
+                if (!this.IsValidCustomRules(i, j))
+                {
+                    throw new MatrixIndexException("Indexes does not follow the implementation-side validation rules.");
                 }
 
                 var oldValue = this.GetValue(i, j);
@@ -115,6 +122,16 @@ namespace GenericMatrices.Matrices
         /// <param name="j">Matrix column.</param>
         /// <param name="value">Value to set in specific cell.</param>
         protected abstract void SetValue(int i, int j, T value);
+
+        /// <summary>
+        /// Determines whether indexes are valid in according to a special condition.
+        /// </summary>
+        /// <param name="i">Matrix row.</param>
+        /// <param name="j">Matrix column.</param>
+        /// <returns>
+        ///   <c>true</c> if indexes are valid; otherwise, <c>false</c>.
+        /// </returns>
+        protected abstract bool IsValidCustomRules(int i, int j);
 
         private bool IsValidIndex(int i, int j) => (i >= 0 && i < this.Size) && (j >= 0 && j < this.Size);
     }
